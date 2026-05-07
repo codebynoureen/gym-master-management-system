@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymMaster - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Dashboard styles */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #34495e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 22px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            gap: 15px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #34495e;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #f8f9fa;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .card-icon.members { background: #e3f2fd; color: #1976d2; }
+        .card-icon.trainers { background: #e8f5e9; color: #388e3c; }
+        .card-icon.classes { background: #fff3e0; color: #f57c00; }
+        .card-icon.equipment { background: #f3e5f5; color: #7b1fa2; }
+        .card-icon.payments { background: #fce4ec; color: #c2185b; }
+
+        .card h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .content-section {
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd5;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        /* Alerts */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .alert-success {
+            background: #4caf50;
+        }
+
+        .alert-error {
+            background: #f44336;
+        }
+
+        .alert-info {
+            background: #2196f3;
+        }
+
+        /* Loading spinner */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .menu-text {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar.open {
+                width: 250px;
+            }
+            
+            .sidebar.open .menu-text {
+                display: inline;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-dumbbell"></i>
+                <h2>GymMaster</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-target="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span class="menu-text">Dashboard</span>
+                </div>
+                <div class="menu-item" data-target="members">
+                    <i class="fas fa-users"></i>
+                    <span class="menu-text">Members</span>
+                </div>
+                <div class="menu-item" data-target="trainers">
+                    <i class="fas fa-user-tie"></i>
+                    <span class="menu-text">Trainers</span>
+                </div>
+                <div class="menu-item" data-target="classes">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="menu-text">Classes</span>
+                </div>
+                <div class="menu-item" data-target="equipment">
+                    <i class="fas fa-dumbbell"></i>
+                    <span class="menu-text">Equipment</span>
+                </div>
+                <div class="menu-item" data-target="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span class="menu-text">Payments</span>
+                </div>
+                <div class="menu-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-text">Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin User</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="content-section active">
+                <div class="dashboard-cards">
+                    <div class="card" onclick="navigateTo('members')">
+                        <div class="card-icon members">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 id="total-members">0</h3>
+                        <p>Total Members</p>
+                    </div>
+                    <div class="card" onclick="navigateTo('trainers')">
+                        <div class="card-icon trainers">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h3 id="total-trainers">0</h3>
+                        <p>Trainers</p>
+                    </div>
+                    <div class="card" onclick="navigateTo('classes')">
+                        <div class="card-icon classes">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3 id="total-classes">0</h3>
+                        <p>Classes</p>
+                    </div>
+                    <div class="card" onclick="navigateTo('equipment')">
+                        <div class="card-icon equipment">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <h3 id="total-equipment">0</h3>
+                        <p>Equipment</p>
+                    </div>
+                    <div class="card" onclick="navigateTo('payments')">
+                        <div class="card-icon payments">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3 id="total-revenue">$0.00</h3>
+                        <p>Revenue</p>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Recent Members</h2>
+                        <button class="btn btn-primary" onclick="navigateTo('members')">View All</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Membership</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-members-table">
+                            <tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <div style="margin-top:15px;">Loading...</div>
+    </div>
+
+    <script>
+        // -------------------- GLOBAL --------------------
+        let currentAdmin = null;
+
+        // -------------------- DOM CONTENT LOADED --------------------
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminData = localStorage.getItem('admin');
+            
+            if (adminData) {
+                currentAdmin = JSON.parse(adminData);
+                document.querySelectorAll('.user-name').forEach(el => {
+                    el.textContent = currentAdmin.username;
+                });
+                document.querySelectorAll('.user-avatar').forEach(el => {
+                    el.textContent = currentAdmin.username.charAt(0).toUpperCase();
+                });
+                loadDashboard();
+            } else {
+                window.location.replace('/admin/login.html');
+                return;
+            }
+
+            initEventListeners();
+        });
+
+        // -------------------- EVENT LISTENERS --------------------
+        function initEventListeners() {
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+            
+            // Add click events to menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (!item.id || item.id !== 'logout-btn') {
+                    item.addEventListener('click', function() {
+                        const target = this.getAttribute('data-target');
+                        if (target) {
+                            navigateTo(target);
+                        }
+                    });
+                }
+            });
+        }
+
+        // -------------------- LOGOUT --------------------
+        function handleLogout() {
+            localStorage.removeItem('admin');
+            window.location.replace('/admin/login.html');
+        }
+
+        // -------------------- NAVIGATION --------------------
+        function navigateTo(page) {
+            window.location.href = `/admin/${page}.html`;
+        }
+
+        // -------------------- DASHBOARD --------------------
+        function loadDashboard() {
+            showLoading('Loading dashboard...');
+            
+            // Fetch all data in parallel
+            Promise.all([
+                fetch('/api/members').then(r => r.json()),
+                fetch('/api/trainers').then(r => r.json()),
+                fetch('/api/classes').then(r => r.json()),
+                fetch('/api/equipment').then(r => r.json()),
+                fetch('/api/payments').then(r => r.json())
+            ])
+            .then(([membersData, trainersData, classesData, equipmentData, paymentsData]) => {
+                hideLoading();
+                
+                // Check for errors in any of the responses
+                if (!membersData.success) throw new Error('Failed to load members: ' + membersData.message);
+                if (!trainersData.success) throw new Error('Failed to load trainers: ' + trainersData.message);
+                if (!classesData.success) throw new Error('Failed to load classes: ' + classesData.message);
+                if (!equipmentData.success) throw new Error('Failed to load equipment: ' + equipmentData.message);
+                if (!paymentsData.success) throw new Error('Failed to load payments: ' + paymentsData.message);
+                
+                // Update stats
+                document.getElementById('total-members').textContent = membersData.members.length;
+                document.getElementById('total-trainers').textContent = trainersData.trainers.length;
+                document.getElementById('total-classes').textContent = classesData.classes.length;
+                document.getElementById('total-equipment').textContent = equipmentData.equipment.length;
+               // document.getElementById('total-payments').textContent = paymentsData.payments.lentgh;
+                
+                // Calculate revenue
+                const totalRevenue = paymentsData.payments
+                    .filter(p => p.status === 'Paid')
+                    .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+                document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+                
+                // Load recent members
+                loadRecentMembers(membersData.members.slice(0, 5));
+            })
+            .catch(err => {
+                hideLoading();
+                showAlert('Failed to load dashboard data: ' + err.message, 'error');
+                console.error('Dashboard loading error:', err);
+            });
+        }
+
+        function loadRecentMembers(members){
+            const tbody = document.getElementById('recent-members-table');
+            if(!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (members.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No members found</td></tr>';
+                return;
+            }
+            
+            members.forEach(m => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${m.name || 'N/A'}</td>
+                    <td>${m.email || 'N/A'}</td>
+                    <td>${m.phone || 'N/A'}</td>
+                    <td>${m.membership_type || 'N/A'}</td>
+                    <td><span class="status-badge status-${m.status ? m.status.toLowerCase() : 'unknown'}">${m.status || 'Unknown'}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // -------------------- SIDEBAR TOGGLE --------------------
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+
+        // -------------------- ALERTS & LOADING --------------------
+        function showAlert(msg, type = 'info') {
+            // Remove any existing alerts first
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = msg;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function showLoading(msg = 'Loading...') {
+            const loader = document.getElementById('loading');
+            if (loader) {
+                loader.style.display = 'flex';
+                const messageDiv = loader.querySelector('div:nth-child(2)');
+                if (messageDiv) {
+                    messageDiv.textContent = msg;
+                }
+            }
+        }
+
+        function hideLoading() {
+            const loader = document.getElementById('loading');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

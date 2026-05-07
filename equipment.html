@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymMaster - Manage Equipment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-dumbbell"></i> <span>GymMaster</span></h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item" data-target="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span class="menu-text">Dashboard</span>
+                </div>
+                <div class="menu-item active" data-target="members">
+                    <i class="fas fa-users"></i>
+                    <span class="menu-text">Members</span>
+                </div>
+                <div class="menu-item" data-target="trainers">
+                    <i class="fas fa-user-tie"></i>
+                    <span class="menu-text">Trainers</span>
+                </div>
+                <div class="menu-item" data-target="classes">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="menu-text">Classes</span>
+                </div>
+                <div class="menu-item active" data-target="equipment">
+                    <i class="fas fa-dumbbell"></i>
+                    <span class="menu-text">Equipment</span>
+                </div>
+                <div class="menu-item" data-target="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span class="menu-text">Payments</span>
+                </div>
+                <div class="menu-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-text">Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-left">
+                    <h1>Manage Equipment</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin User</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment Content -->
+            <div class="content-section active">
+                <div class="section-header">
+                    <h2>Equipment Inventory</h2>
+                    <button class="btn btn-primary add-btn" data-type="equipment">Add New Equipment</button>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Purchase Date</th>
+                            <th>Last Maintenance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipment-table">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
